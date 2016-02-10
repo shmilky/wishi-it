@@ -1,4 +1,4 @@
-.wishiBtn {
+#wishiBtn {
     height: 40px;
     width: 40px;
     position: absolute;
@@ -12,6 +12,6 @@
     background-color: transparent;
     background-size: 40px 40px
 }
-.wishiBtn:hover {
+#wishiBtn:hover {
     display : block !important;
 }
