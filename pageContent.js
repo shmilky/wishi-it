@@ -23,9 +23,11 @@ var addWishiItButtons = function() {
             newButton.css("display", "block");
         }
 
+        var linkUrl = encodeURIComponent(fixImgSrcUrl(imgElement.attr("src")));
+
         // Will set the link to the according to the current image
         // http://www.wishi.me/app/#/landing/addToCloset?picture_url=%image_src%
-        newButton.attr("href", "http://www.wishi.me/app/#/landing/addToCloset?picture_url=" + imgElement.attr("src"));
+        newButton.attr("href", "http://www.wishi.me/app/#/landing/addToCloset?picture_url=" + linkUrl + '&pageUrl=' + encodeURIComponent(window.location.href));
 
         if (wishiBtnArr.length == 0) {
             newButton.insertAfter(imgElement);
@@ -34,6 +36,28 @@ var addWishiItButtons = function() {
         // Will hide the button when leaving the image element.
         $(this).parent().find(".wishiBtn").css( "display", "none");
     });
+
+    var fixImgSrcUrl = function(url) {
+        if (url.length > 2) {
+            if (url.length > 4 && url.substr(0, 4) == 'http') {
+                return url;
+            }
+
+            if(url[0] == '/' && url[1] == '/') {
+                return 'http:' + url;
+            }
+
+            if (url[0] == '/') {
+                return 'http://' + window.location.host + window.location.pathname + url;
+            }
+
+            if (url.substr(0, 2) == './') {
+                return 'http://' + window.location.host + window.location.pathname + url.substr(1, url.length - 1);
+            }
+        }
+
+        return url;
+    };
 };
 
 $(document).ready(function() {
