@@ -11,7 +11,7 @@
       "matches": ["http://*/*", "https://*/*"],
       "exclude_matches": ["http://*.wishi.me/*", "https://*.wishi.me/*", "http://wishi.me/*", "https://wishi.me/*"],
       "css": ["pageContent.css"],
-      "js": ["jquery-2.2.0.min.js", "pageContent.min.js"],
+      "js": ["jquery-2.2.0.min.js", "pageContent.js"],
       "run_at": "document_start"
     }
   ],

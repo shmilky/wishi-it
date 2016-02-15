@@ -26,6 +26,8 @@ var addWishiItButtons = function() {
 
     // Will try to improve the url to be a correct one on simple cases
     var fixImgSrcUrl = function(url) {
+        url = url.trim();
+
         if (url.length > 3) {
             if (url.length > 4 && url.substr(0, 4) == 'http') {
                 return url;
