@@ -73,7 +73,8 @@ var getImgSrcAndExec = function(imgElement, succCB, failCB) {
                     pic_real_height = this.height; // work for in memory images.
                 }
 
-                if (pic_real_width > 100 && pic_real_height > 100) {
+                if (pic_real_width > 100 && pic_real_height > 100 && presentedImages.indexOf(pictureUrl) < 0) {
+                    presentedImages.push(pictureUrl);
                     succCB(imgElement, pictureUrl);
                 }
             });
@@ -117,6 +118,8 @@ $(window).scroll(function() {
     window.setTimeout(addWishiItButtons, 1000);
 });
 
+var presentedImages = [];
+
 // We'll build the on top view for the wishi new view
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         if (request && request.message) {
@@ -127,7 +130,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         if ($('.closeWishiExtension').length == 0) {
             var wishiWindowViewStr = '<div id="wishiItemsCanvas">' +
                 '<div class="topViewHeader">' +
-                '<h4 class="topViewHeadline">Choose what you want to add to your closet</h4>' +
+                '<div class="topViewHeadline">Add an item to your closet</div>' +
                 '<a href="#" class="closeWishiExtension">X</a>' +
                 '</div>' +
                 '<div class="wishiImagesRowWrapper">' +
@@ -143,6 +146,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 e.preventDefault();
                 $('#wishiItemsCanvas').remove();
                 body.css("overflow-y", "");
+                presentedImages = [];
             });
 
             addWishiImagesToWindow($('.wishiImagesRow'))

@@ -24,7 +24,6 @@
     height: 100%;
     width: 100%;
     background: rgba(10, 14, 19, 0.85);
-    overflow-y: scroll;
 }
 #wishiItemsCanvas .topViewHeader {
     position: absolute;
@@ -38,6 +37,8 @@
     float: left;
     color: white;
     font-size: 18px;
+    line-height: 70px;
+    padding-left: 20px;
 }
 .topViewHeader .closeWishiExtension {
     float: right;
@@ -53,6 +54,8 @@
 }
 #wishiItemsCanvas .wishiImagesRowWrapper {
     padding-top: 70px;
+    height: 100%;
+    overflow-y: scroll;
 }
 .wishiImagesRowWrapper .wishiImagesRow{
     width: 90%;
@@ -64,7 +67,7 @@
     float: left;
     margin: 10px;
     background: white;
-    border-radius: 6px;
+    border-radius: 4px;
     box-shadow: rgba(0, 0, 0, 0.219608) 0px 1px 2px 0px;
     overflow: hidden;
     font-size: 0;
