@@ -3,28 +3,12 @@ var wishiButton = "<a id=\"wishiBtn\" title=\"Add item to your Wishi closet\" ta
 var addWishiItButtons = function() {
     // First we'll start by unbinding old wishiEvents and only then we'll add the new events.
     $("img").unbind('mouseenter.wishiEvent mouseleave.wishiEvent').on('mouseenter.wishiEvent', function() {
-        var imgElement = $(this);
-        var newButton = $('#wishiBtn');
 
-        // A var for the picture url to be stored in.
-        var pictureUrl;
+        // get the image url form the img element and execute the callback if it's valid
+        getImgSrcAndExec(this, function(imgElement, pictureUrl) {
+            pictureUrl = encodeURIComponent(pictureUrl);
+            var newButton = $('#wishiBtn');
 
-        // We'll try to check if the img has a valid srcset vars for the img src
-        var imgSrcsetAtrr = imgElement.attr('srcset');
-        if (!!imgSrcsetAtrr) {
-            var srcsetAsStrArr = imgSrcsetAtrr.trim().split(' ');
-            if (srcsetAsStrArr.length > 0) {
-                pictureUrl = encodeURIComponent(fixImgSrcUrl(srcsetAsStrArr[0]));
-            }
-        }
-
-        // In case we don't have srcset (probably most cases will be like that)
-        if (!pictureUrl) {
-            pictureUrl = encodeURIComponent(fixImgSrcUrl(imgElement.attr("src")));
-        }
-
-        // Only if we have a valid picture url the wishi button will appear
-        if (pictureUrl && pictureUrl.length > 7) {
             // Set the position of the wishi button
             newButton.css("top", imgElement.offset().top + 10 + "px");
             newButton.css("left", imgElement.offset().left + 10 + "px");
@@ -36,34 +20,87 @@ var addWishiItButtons = function() {
 
             // Will set the link to the according to the current image
             newButton.attr("href", "http://www.wishi.me/app/#/landing/addToCloset?picture_url=" + pictureUrl + '&pageUrl=' + encodeURIComponent(window.location.href));
-        }
+        });
     }).on('mouseleave.wishiEvent', function() {
         // Will hide the button when leaving the image element.
         $("#wishiBtn").css( "display", "none");
     });
+};
 
-    // Will try to improve the url to be a correct one on simple cases
-    var fixImgSrcUrl = function(url) {
-        url = url.trim();
+var addWishiImagesToWindow = function(imagesRow) {
+    $('img').each(function() {
+        // get the image url form the img element and execute the callback if it's valid
+        getImgSrcAndExec(this, function(imgElement, pictureUrl) {
+            var newImgStr = '<div class="wishiImgThumb">' +
+                    '<div class="imgWrapper">' +
+                        '<img class="wishiImg" src="' + pictureUrl + '">' +
+                    '<div>' +
+                '</div>';
+            imagesRow.append(newImgStr);
+        });
+    });
+};
 
-        if (url.length > 3) {
-            if (url.length > 4 && url.substr(0, 4) == 'http') {
-                return url;
-            }
+// Wil try to retrieve img src url.
+var getImgSrcAndExec = function(imgElement, succCB, failCB) {
+    var imgElement = $(imgElement);
 
-            if(url[0] == '/' && url[1] == '/') {
-                return window.location.protocol + url;
-            }
+    // A var for the picture url to be stored in.
+    var pictureUrl;
 
-            if (url[0] == '/') {
-                return window.location.host.href + '/' + url.substr(1, url.length - 1);
-            }
+    // We'll try to check if the img has a valid srcset vars for the img src
+    var imgSrcsetAtrr = imgElement.attr('srcset');
+    if (!!imgSrcsetAtrr) {
+        var srcsetAsStrArr = imgSrcsetAtrr.trim().split(' ');
+        if (srcsetAsStrArr.length > 0) {
+            pictureUrl = fixImgSrcUrl(srcsetAsStrArr[0]);
+        }
+    }
 
-            return window.location.host.href + '/' + url;
+    // In case we don't have srcset (probably most cases will be like that)
+    if (!pictureUrl) {
+        pictureUrl = fixImgSrcUrl(imgElement.attr("src"));
+    }
+
+    // If the img src url is valid we'll return it otherwise we'll return null.
+    if (pictureUrl && pictureUrl.length > 7) {
+        var pic_real_width, pic_real_height;
+        $("<img/>") // Make in memory copy of image to avoid css issues
+            .attr("src", pictureUrl)
+            .load(function() {
+                if (this) {
+                    pic_real_width = this.width;   // Note: $(this).width() will not
+                    pic_real_height = this.height; // work for in memory images.
+                }
+
+                if (pic_real_width > 100 && pic_real_height > 100) {
+                    succCB(imgElement, pictureUrl);
+                }
+            });
+    }
+};
+
+// Will try to improve the url to be a correct one on simple cases
+var fixImgSrcUrl = function(url) {
+    url = url.trim();
+
+    if (url.length > 3) {
+        if (url.length > 4 && url.substr(0, 4) == 'http') {
+            return url;
         }
 
-        return false;
-    };
+        if(url[0] == '/' && url[1] == '/') {
+            return window.location.protocol + url;
+        }
+
+        if (url[0] == '/') {
+            return window.location.host.href + '/' + url.substr(1, url.length - 1);
+        }
+
+        return window.location.host.href + '/' + url;
+    }
+
+    return false;
 };
 
 // When the document is ready we'll run our code.
@@ -79,3 +116,39 @@ $(document).ready(function() {
 $(window).scroll(function() {
     window.setTimeout(addWishiItButtons, 1000);
 });
+
+// We'll build the on top view for the wishi new view
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+        if (request && request.message) {
+            console.log(request.message);
+        }
+
+        sendResponse({message: "init wishi view"});
+        if ($('.closeWishiExtension').length == 0) {
+            var wishiWindowViewStr = '<div id="wishiItemsCanvas">' +
+                '<div class="topViewHeader">' +
+                '<h4 class="topViewHeadline">Choose what you want to add to your closet</h4>' +
+                '<a href="#" class="closeWishiExtension">X</a>' +
+                '</div>' +
+                '<div class="wishiImagesRowWrapper">' +
+                '<div class="wishiImagesRow"></div>' +
+                '</div>' +
+                '</div>';
+
+            var body = $('body');
+            body.append(wishiWindowViewStr);
+            body.css("overflow-y", "hidden");
+
+            $('.closeWishiExtension').click(function(e) {
+                e.preventDefault();
+                $('#wishiItemsCanvas').remove();
+                body.css("overflow-y", "");
+            });
+
+            addWishiImagesToWindow($('.wishiImagesRow'))
+
+            window.setTimeout(addWishiItButtons, 1000);
+        }
+    }
+);
+
