@@ -1,4 +1,6 @@
 var wishiOneTimeBtn = '<a id="wishiOneTimeBtn" class="wishiBtn" title="Add item to your Wishi closet" target="_blank"></a>';
+var uploadItemWishiUrl = 'http://www.wishi.me/app/#/landing/addToCloset';
+//var uploadItemWishiUrl = 'http://localhost:8000/web/app/#/landing/addToCloset';
 
 var addWishiItButtons = function() {
     // First we'll start by unbinding old wishiEvents and only then we'll add the new events.
@@ -10,20 +12,20 @@ var addWishiItButtons = function() {
             var newButton = $('#wishiOneTimeBtn');
 
             // Set the position of the wishi button
-            newButton.css("top", imgElement.offset().top + 10 + "px");
-            newButton.css("left", imgElement.offset().left + 10 + "px");
+            newButton.css('top', imgElement.offset().top + 10 + 'px');
+            newButton.css('left', imgElement.offset().left + 10 + 'px');
 
             // Will display the button only if the image is big enough
             if (imgElement.width() > 100 && imgElement.height() > 100) {
-                newButton.css("display", "block");
+                newButton.css('display', 'block');
             }
 
             // Will set the link to the according to the current image
-            newButton.attr("href", "http://www.wishi.me/app/#/landing/addToCloset?picture_url=" + pictureUrl + '&pageUrl=' + encodeURIComponent(window.location.href));
+            newButton.attr('href', uploadItemWishiUrl+ '?picture_url=' + encodeURIComponent(pictureUrl) + '&pageUrl=' + encodeURIComponent(window.location.href));
         });
     }).on('mouseleave.wishiEvent', function() {
         // Will hide the button when leaving the image element.
-        $("#wishiOneTimeBtn").css( "display", "none");
+        $('#wishiOneTimeBtn').css( 'display', 'none');
     });
 };
 
@@ -37,10 +39,10 @@ var addWishiImagesToWindow = function() {
                 // Add the image to reduce multiplication.
                 presentedImages.push(pictureUrl);
 
-                var addImgToClosetLink = 'http://www.wishi.me/app/#/landing/addToCloset?picture_url=' + pictureUrl + '&pageUrl=' + encodeURIComponent(window.location.href) + '"';
+                var addImgToClosetLink = uploadItemWishiUrl + '?picture_url=' + encodeURIComponent(pictureUrl) + '&pageUrl=' + encodeURIComponent(window.location.href);
 
                 var newImgStr = '<div class="wishiImgThumb">' +
-                    '<a class="wishiBtn" title="Add item to your Wishi closet" target="_blank" href=' + addImgToClosetLink + '></a>' +
+                    '<a class="wishiBtn" title="Add item to your Wishi closet" target="_blank" href="' + addImgToClosetLink + '"></a>' +
                     '<div class="imgWrapper">' +
                     '<img class="wishiImg" src="' + pictureUrl + '">' +
                     '<div>' +
@@ -48,10 +50,10 @@ var addWishiImagesToWindow = function() {
                 imagesRow.append(newImgStr);
 
                 $('.wishiImgThumb:last').on('mouseenter', function() {
-                    $(this).find('.wishiBtn').css("display", "block");
+                    $(this).find('.wishiBtn').css('display', 'block');
                 }).on('mouseleave', function() {
                     // Will hide the button when leaving the image element.
-                    $(this).find('.wishiBtn').css( "display", "none");
+                    $(this).find('.wishiBtn').css( 'display', 'none');
                 });
             }
         });
@@ -60,7 +62,7 @@ var addWishiImagesToWindow = function() {
 
 // Wil try to retrieve img src url.
 var getImgSrcAndExec = function(imgElement, succCB, failCB) {
-    var imgElement = $(imgElement);
+    imgElement = $(imgElement);
 
     // A var for the picture url to be stored in.
     var pictureUrl;
@@ -76,14 +78,14 @@ var getImgSrcAndExec = function(imgElement, succCB, failCB) {
 
     // In case we don't have srcset (probably most cases will be like that)
     if (!pictureUrl) {
-        pictureUrl = fixImgSrcUrl(imgElement.attr("src"));
+        pictureUrl = fixImgSrcUrl(imgElement.attr('src'));
     }
 
     // If the img src url is valid we'll return it otherwise we'll return null.
     if (pictureUrl && pictureUrl.length > 7) {
         var pic_real_width, pic_real_height;
-        $("<img/>") // Make in memory copy of image to avoid css issues
-            .attr("src", pictureUrl)
+        $('<img/>') // Make in memory copy of image to avoid css issues
+            .attr('src', pictureUrl)
             .load(function() {
                 if (this) {
                     pic_real_width = this.width;   // Note: $(this).width() will not
@@ -124,7 +126,7 @@ var fixImgSrcUrl = function(url) {
 $(document).ready(function() {
     $('body').append($(wishiOneTimeBtn));
     window.setTimeout(addWishiItButtons, 1000);
-    $(window).on("hashchange", function() {
+    $(window).on('hashchange', function() {
         window.setTimeout(addWishiItButtons, 1000);
     });
 });
@@ -142,11 +144,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             console.log(request.message);
         }
 
-        sendResponse({message: "init wishi view"});
+        sendResponse({message: 'init wishi view'});
         if ($('.closeWishiExtension').length == 0) {
             var wishiWindowViewStr = '<div id="wishiItemsCanvas">' +
                 '<div class="topViewHeader">' +
-                '<div class="topViewHeadline">Add an item to your closet</div>' +
+                '<div class="topViewHeadline">Add items to your closet</div>' +
                 '<a href="#" class="closeWishiExtension">X</a>' +
                 '</div>' +
                 '<div class="wishiImagesRowWrapper">' +
@@ -156,12 +158,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
             var body = $('body');
             body.append(wishiWindowViewStr);
-            body.css("overflow-y", "hidden");
+            body.css('overflow-y', 'hidden');
 
             $('.closeWishiExtension').click(function(e) {
                 e.preventDefault();
                 $('#wishiItemsCanvas').remove();
-                body.css("overflow-y", "");
+                body.css('overflow-y', '');
                 presentedImages = [];
             });
 

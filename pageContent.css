@@ -49,10 +49,10 @@
     width: 20px;
     color: gray;
     font-size: 21px;
+    text-decoration: none !important;
 }
 .topViewHeader .closeWishiExtension:hover {
     color: white;
-    text-decoration: none;
 }
 #wishiItemsCanvas .wishiImagesRowWrapper {
     padding-top: 70px;
