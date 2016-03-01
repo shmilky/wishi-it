@@ -1,13 +1,13 @@
-var wishiButton = "<a id=\"wishiBtn\" title=\"Add item to your Wishi closet\" target=\"_blank\"></a>";
+var wishiOneTimeBtn = '<a id="wishiOneTimeBtn" class="wishiBtn" title="Add item to your Wishi closet" target="_blank"></a>';
 
 var addWishiItButtons = function() {
     // First we'll start by unbinding old wishiEvents and only then we'll add the new events.
-    $("img").unbind('mouseenter.wishiEvent mouseleave.wishiEvent').on('mouseenter.wishiEvent', function() {
+    $('img:not(.wishiImg)').unbind('mouseenter.wishiEvent mouseleave.wishiEvent').on('mouseenter.wishiEvent', function() {
 
         // get the image url form the img element and execute the callback if it's valid
         getImgSrcAndExec(this, function(imgElement, pictureUrl) {
             pictureUrl = encodeURIComponent(pictureUrl);
-            var newButton = $('#wishiBtn');
+            var newButton = $('#wishiOneTimeBtn');
 
             // Set the position of the wishi button
             newButton.css("top", imgElement.offset().top + 10 + "px");
@@ -23,20 +23,37 @@ var addWishiItButtons = function() {
         });
     }).on('mouseleave.wishiEvent', function() {
         // Will hide the button when leaving the image element.
-        $("#wishiBtn").css( "display", "none");
+        $("#wishiOneTimeBtn").css( "display", "none");
     });
 };
 
-var addWishiImagesToWindow = function(imagesRow) {
+var addWishiImagesToWindow = function() {
+    var imagesRow = $('.wishiImagesRow');
     $('img').each(function() {
         // get the image url form the img element and execute the callback if it's valid
         getImgSrcAndExec(this, function(imgElement, pictureUrl) {
-            var newImgStr = '<div class="wishiImgThumb">' +
+            // Check that we don't have this image on our images yet.
+            if(presentedImages.indexOf(pictureUrl) < 0) {
+                // Add the image to reduce multiplication.
+                presentedImages.push(pictureUrl);
+
+                var addImgToClosetLink = 'http://www.wishi.me/app/#/landing/addToCloset?picture_url=' + pictureUrl + '&pageUrl=' + encodeURIComponent(window.location.href) + '"';
+
+                var newImgStr = '<div class="wishiImgThumb">' +
+                    '<a class="wishiBtn" title="Add item to your Wishi closet" target="_blank" href=' + addImgToClosetLink + '></a>' +
                     '<div class="imgWrapper">' +
-                        '<img class="wishiImg" src="' + pictureUrl + '">' +
+                    '<img class="wishiImg" src="' + pictureUrl + '">' +
                     '<div>' +
-                '</div>';
-            imagesRow.append(newImgStr);
+                    '</div>';
+                imagesRow.append(newImgStr);
+
+                $('.wishiImgThumb:last').on('mouseenter', function() {
+                    $(this).find('.wishiBtn').css("display", "block");
+                }).on('mouseleave', function() {
+                    // Will hide the button when leaving the image element.
+                    $(this).find('.wishiBtn').css( "display", "none");
+                });
+            }
         });
     });
 };
@@ -73,8 +90,7 @@ var getImgSrcAndExec = function(imgElement, succCB, failCB) {
                     pic_real_height = this.height; // work for in memory images.
                 }
 
-                if (pic_real_width > 100 && pic_real_height > 100 && presentedImages.indexOf(pictureUrl) < 0) {
-                    presentedImages.push(pictureUrl);
+                if (pic_real_width > 100 && pic_real_height > 100) {
                     succCB(imgElement, pictureUrl);
                 }
             });
@@ -106,7 +122,7 @@ var fixImgSrcUrl = function(url) {
 
 // When the document is ready we'll run our code.
 $(document).ready(function() {
-    $('body').append($(wishiButton));
+    $('body').append($(wishiOneTimeBtn));
     window.setTimeout(addWishiItButtons, 1000);
     $(window).on("hashchange", function() {
         window.setTimeout(addWishiItButtons, 1000);
@@ -149,9 +165,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 presentedImages = [];
             });
 
-            addWishiImagesToWindow($('.wishiImagesRow'))
-
-            window.setTimeout(addWishiItButtons, 1000);
+            addWishiImagesToWindow();
         }
     }
 );
