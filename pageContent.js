@@ -157,13 +157,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 '</div>';
 
             var body = $('body');
+            var html = $('html');
             body.append(wishiWindowViewStr);
             body.css('overflow-y', 'hidden');
+            html.css('overflow-y', 'hidden');
 
             $('.closeWishiExtension').click(function(e) {
                 e.preventDefault();
                 $('#wishiItemsCanvas').remove();
                 body.css('overflow-y', '');
+                html.css('overflow-y', '');
                 presentedImages = [];
             });
 
