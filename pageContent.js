@@ -1,6 +1,25 @@
 var wishiOneTimeBtn = '<a id="wishiOneTimeBtn" class="wishiBtn" title="Add item to your Wishi closet" target="_blank"></a>';
 var uploadItemWishiUrl = 'http://www.wishi.me/app/#/landing/addToCloset';
-//var uploadItemWishiUrl = 'http://localhost:8000/web/app/#/landing/addToCloset';
+// var uploadItemWishiUrl = 'https://stage.wishi.me/app/#/landing/addToCloset';
+// var uploadItemWishiUrl = 'http://localhost:8000/web/app/#/landing/addToCloset';
+
+function getWishiUrl (pictureUrl) {
+    var url = uploadItemWishiUrl;
+    url += '?picture_url=' + encodeURIComponent(pictureUrl);
+    url += '&pageUrl=' + encodeURIComponent(window.location.href);
+
+    var itemPrice = $("*[itemprop='price']").attr('content');
+    if (itemPrice) {
+        url += '&item_price=' + itemPrice;
+    }
+
+    var itemBrand = $("*[itemprop='brand'] *[itemprop='name']").text();
+    if (itemBrand && itemBrand !== 'Unbranded') {
+        url += '&item_brand=' + itemBrand;
+    }
+
+    return url;
+}
 
 var addWishiItButtons = function() {
     // First we'll start by unbinding old wishiEvents and only then we'll add the new events.
@@ -21,7 +40,7 @@ var addWishiItButtons = function() {
             }
 
             // Will set the link to the according to the current image
-            newButton.attr('href', uploadItemWishiUrl+ '?picture_url=' + encodeURIComponent(pictureUrl) + '&pageUrl=' + encodeURIComponent(window.location.href));
+            newButton.attr('href', getWishiUrl(pictureUrl));
         });
     }).on('mouseleave.wishiEvent', function() {
         // Will hide the button when leaving the image element.
@@ -39,10 +58,8 @@ var addWishiImagesToWindow = function() {
                 // Add the image to reduce multiplication.
                 presentedImages.push(pictureUrl);
 
-                var addImgToClosetLink = uploadItemWishiUrl + '?picture_url=' + encodeURIComponent(pictureUrl) + '&pageUrl=' + encodeURIComponent(window.location.href);
-
                 var newImgStr = '<div class="wishiImgThumb">' +
-                    '<a class="wishiBtn" title="Add item to your Wishi closet" target="_blank" href="' + addImgToClosetLink + '"></a>' +
+                    '<a class="wishiBtn" title="Add item to your Wishi closet" target="_blank" href="' + getWishiUrl(pictureUrl) + '"></a>' +
                     '<div class="imgWrapper">' +
                     '<img class="wishiImg" src="' + pictureUrl + '">' +
                     '<div>' +
@@ -143,6 +160,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         if (request && request.message) {
             console.log(request.message);
         }
+
 
         sendResponse({message: 'init wishi view'});
         if ($('.closeWishiExtension').length == 0) {
