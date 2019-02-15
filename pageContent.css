@@ -1,6 +1,6 @@
 .wishiBtn {
-    height: 40px;
-    width: 40px;
+    height: 32px;
+    width: 32px;
     position: absolute;
     top: 10px;
     left: 10px;
@@ -10,9 +10,9 @@
     border: none;
     display: none;
     /*display: block;*/
-    background-image: url("http://wishi.me/images/favicon.png");
+    background-image: url("https://wishi.me/images/favicon-32x32.png");
     background-color: transparent;
-    background-size: 40px 40px
+    background-size: 32px 32px
 }
 .wishiBtn:hover {
     display : block !important;
