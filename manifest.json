@@ -1,7 +1,7 @@
 {
   "name": "Wishi Me",
-  "version": "0.0.5",
-  "manifest_version": 2,
+  "version": "1.0.0",
+  "manifest_version": 3,
   "description": "Add items you really own to your Wishi closet",
   "icons": { "16": "wishi16.png",
     "48": "wishi48.png",
@@ -19,7 +19,7 @@
     "scripts": ["onClick.js"]
   },
   "browser_action": {
-    "default_icon": "wishi48.png",
+    "default_icon": "wishi16.png",
     "default_title": "Wishi Me"
   },
   "permissions": [
